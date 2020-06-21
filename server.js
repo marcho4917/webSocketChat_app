@@ -8,6 +8,7 @@ const server = app.listen(8000, () => {
 });
 
 const messages = [];
+let users =[];
 
 const io = socket(server);
 app.use(express.static(path.join(__dirname, '/client')));
@@ -19,11 +20,16 @@ app.get('*', (req, res) => {
 io.on('connection', (socket) => {
     console.log('New client! Its id – ' + socket.id);
     socket.on('message', (message) => { 
-    console.log('Oh, I\'ve got something from ' + socket.id);
-    messages.push(message);
-    socket.broadcast.emit('message', message);
+        console.log('Oh, I\'ve got something from ' + socket.id);
+        messages.push(message);
+        socket.broadcast.emit('message', message);
     });
-    socket.on('disconnect', () => { 
-    console.log('Oh, socket ' + socket.id + ' has left') 
+    socket.on('disconnect', () => {
+        const disconectedUser = users.find(el => el.id === socket.id);
+        socket.broadcast.emit('removeUser', disconectedUser.author);
+    })
+    socket.on('join', (userName) => {
+        users.push({author: userName, id: socket.id});
+        socket.broadcast.emit('join', userName);
     });
   });
