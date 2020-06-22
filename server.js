@@ -8,7 +8,7 @@ const server = app.listen(8000, () => {
 });
 
 const messages = [];
-let users =[];
+let users = [];
 
 const io = socket(server);
 app.use(express.static(path.join(__dirname, '/client')));
@@ -27,7 +27,8 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
         const disconectedUser = users.find(el => el.id === socket.id);
         socket.broadcast.emit('removeUser', disconectedUser.author);
-    })
+        users.splice(disconectedUser);
+    });
     socket.on('join', (userName) => {
         users.push({author: userName, id: socket.id});
         socket.broadcast.emit('join', userName);
