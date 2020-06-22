@@ -26,11 +26,13 @@ io.on('connection', (socket) => {
     });
     socket.on('disconnect', () => {
         const disconectedUser = users.find(el => el.id === socket.id);
+        users = users.filter(disconectedUser => (disconectedUser.id !== socket.id));
         socket.broadcast.emit('removeUser', disconectedUser.author);
-        users.splice(disconectedUser);
+        console.log('users:', users);
     });
     socket.on('join', (userName) => {
         users.push({author: userName, id: socket.id});
         socket.broadcast.emit('join', userName);
+        console.log('users:', users);
     });
   });
